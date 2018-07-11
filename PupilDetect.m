@@ -88,9 +88,11 @@ for ii=1:N
         if count==1
             if norm([pupil_ellipse(1),pupil_ellipse(2)]-pupilCenterEst)>5
                 imshow(miniim);caxis([20 50]);
+                hold on;plotellipse(pupil_ellipse(1:2)',pupil_ellipse(3),pupil_ellipse(4),pupil_ellipse(5),'r--');
                 title('Click on a bunch of points around pupil edge');
                 [X,Y] = getpts;
                 if isempty(X)
+                elseif length(X)==1
                     pupil_ellipse = [0 0 0 0 0]';
                 else
                     [z,a,b,alpha] = fitellipse([X,Y]');
@@ -102,8 +104,11 @@ for ii=1:N
                     abs((pupil_ellipse(3)+pupil_ellipse(4))-pupilDiameter(count-1))>10
                 imshow(miniim);caxis([20 50]);
                 title('Click on a bunch of points around pupil edge');
+                hold on;plotellipse(pupil_ellipse(1:2)',pupil_ellipse(3),pupil_ellipse(4),pupil_ellipse(5),'r--');
                 [X,Y] = getpts;
                 if isempty(X)
+                    
+                elseif length(X)==1
                     pupil_ellipse = [0 0 0 0 0]';
                 else
                     try
