@@ -104,10 +104,11 @@ for ii=1:N
                     abs((pupil_ellipse(3)+pupil_ellipse(4))-pupilDiameter(count-1))>10
                 imshow(miniim);caxis([20 50]);
                 title('Click on a bunch of points around pupil edge');
-                hold on;plotellipse(pupil_ellipse(1:2)',pupil_ellipse(3),pupil_ellipse(4),pupil_ellipse(5),'r--');
+                hold on;plotellipse(prevPupilEllipse(1:2)',prevPupilEllipse(3),...
+                    prevPupilEllipse(4),prevPupilEllipse(5),'r--');
                 [X,Y] = getpts;
                 if isempty(X)
-                    
+                    pupil_ellipse = prevPupilEllipse;
                 elseif length(X)==1
                     pupil_ellipse = [0 0 0 0 0]';
                 else
@@ -125,12 +126,13 @@ for ii=1:N
             end
         end
         
-        pupilCenterEst = [pupil_ellipse(1),pupil_ellipse(2)];
+        
         
         if sum(pupil_ellipse)==0
             blink(count) = 1;
             pupilCenterEst = pupilRotation(count-1,:)+pupilTranslation(count-1,:);
         else
+            pupilCenterEst = [pupil_ellipse(1),pupil_ellipse(2)];
 %             imagesc(miniim);colormap('bone');caxis([20 60]);
 %             hold on;plotellipse(pupil_ellipse(1:2)',pupil_ellipse(3),pupil_ellipse(4),pupil_ellipse(5),'b--');
 %             pause(1/100);
@@ -140,6 +142,8 @@ for ii=1:N
         pupilArea(count) = pupil_ellipse(3)*pupil_ellipse(4)*pi;
         pupilRotation(count,:) = [pupil_ellipse(1),pupil_ellipse(2)]-ledPos;
         pupilDiameter(count) = pupil_ellipse(3)+pupil_ellipse(4);
+        
+        prevPupilEllipse = pupil_ellipse;
     end
 end
 N = count;
