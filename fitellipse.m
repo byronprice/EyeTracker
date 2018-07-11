@@ -110,8 +110,8 @@ if params.fNonlinear
     
     % Return linear estimate if GN doesn't converge
     if ~fConverged
-        warning('fitellipse:FailureToConverge', ...'
-            'Gauss-Newton did not converge, returning linear estimate');
+%         warning('fitellipse:FailureToConverge', ...'
+%             'Gauss-Newton did not converge, returning linear estimate');
         z = z0;
         a = a0;
         b = b0;
@@ -250,10 +250,10 @@ z     = u(end-1:end);
         % Gauss-Newton step won't work. 
         %TODO: This can be fixed by switching to a Levenberg-Marquardt
         %solver
-        if abs(a - b) / (a + b) < circTol
-            warning('fitellipse:CircleFound', ...
-                'Ellipse is near-circular - nonlinear fit may not succeed')
-        end
+%         if abs(a - b) / (a + b) < circTol
+%             warning('fitellipse:CircleFound', ...
+%                 'Ellipse is near-circular - nonlinear fit may not succeed')
+%         end
         
         % Convenience trig variables
         c = cos(phi);
