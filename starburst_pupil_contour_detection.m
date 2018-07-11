@@ -45,7 +45,7 @@ tcy(loop_count+1) = cy;
 edge_thresh = pupil_edge_thresh;
 angle_step= 2*pi/N;
 
-maxIter = 10;
+maxIter = 20;
 
 while edge_thresh > edgeMin && loop_count <= maxIter
     epx = [];
@@ -70,7 +70,7 @@ while edge_thresh > edgeMin && loop_count <= maxIter
     loop_count = loop_count+1;
     tcx(loop_count+1) = mean(epx);
     tcy(loop_count+1) = mean(epy);
-    if abs(tcx(loop_count+1)-cx) + abs(tcy(loop_count+1)-cy) < 5
+    if abs(tcx(loop_count+1)-cx) + abs(tcy(loop_count+1)-cy) < 4
         break;
     end
     cx = tcx(loop_count+1);
