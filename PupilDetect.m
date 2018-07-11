@@ -147,5 +147,5 @@ time = linspace(0,N/v.FrameRate,N);
 filename = filename(1:end-4);
 filename = strcat(filename,'.mat');
 save(filename,'pupilArea','pupilRotation','pupilTranslation',...
-    'pupilDiameter','N','time','blink');
+    'pupilDiameter','N','time','blink','meanLuminance');
 end
