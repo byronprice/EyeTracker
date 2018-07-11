@@ -70,7 +70,7 @@ while edge_thresh > edgeMin && loop_count <= maxIter
     loop_count = loop_count+1;
     tcx(loop_count+1) = mean(epx);
     tcy(loop_count+1) = mean(epy);
-    if abs(tcx(loop_count+1)-cx) + abs(tcy(loop_count+1)-cy) < maxIter,
+    if abs(tcx(loop_count+1)-cx) + abs(tcy(loop_count+1)-cy) < 5
         break;
     end
     cx = tcx(loop_count+1);
