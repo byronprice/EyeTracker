@@ -16,16 +16,16 @@ v = VideoReader(filename);
 N = ceil(v.Duration*v.FrameRate);
 
 pupilArea = zeros(N,1);
+pupilDiameter = zeros(N,1);
 pupilTranslation = zeros(N,2);
 pupilRotation = zeros(N,2);
 
 meanLuminance = zeros(N,1);
 blink = zeros(N,1);
 
-se = strel('disk',2);
-se2 = strel('disk',10);
 conn = 8;
-pupilLuminanceThreshold = 31;
+edgeThreshold = 3;% THE MAIN FREE PARAMETERS
+luminanceThreshold = 33;
 count = 0;
 for ii=1:N
     if hasFrame(v)
@@ -39,14 +39,15 @@ for ii=1:N
             minX = round(min(X));maxX = round(max(X));
             minY = round(min(Y));maxY = round(max(Y));
             
-%             imshow(uint8(im(minY:maxY,minX:maxX)));
-%             title('Click on center of pupil');
-%             [X,Y] = getpts;
-%             pupilCenterEst = [X,Y];
+            imshow(uint8(im(minY:maxY,minX:maxX)));caxis([20 50]);
+            title('Click on center of pupil');
+            [X,Y] = getpts;
+            pupilCenterEst = [X,Y];
             
         end
         miniim = im(minY:maxY,minX:maxX);
         miniim = imgaussfilt(miniim,1);
+        
         meanLuminance(count) = mean(miniim(:));
         
             %     get bright spot from IR led reflection
@@ -69,63 +70,71 @@ for ii=1:N
             ledPos = pupilTranslation(count-1,:);
             blink(count) = 1;
         end
-
-        % prepare to find the pupil
-        temp = miniim<pupilLuminanceThreshold;
-        temp = imopen(temp,se);
-        temp = imclose(temp,se2);
         
-        CC = bwconncomp(temp,conn);
+        [pupil_ellipse,~] = ...
+            detect_pupil_and_corneal_reflection(miniim,pupilCenterEst(1),pupilCenterEst(2),edgeThreshold,luminanceThreshold);
         
-        distance = zeros(CC.NumObjects,1);
-        for jj=1:CC.NumObjects
-            if size(CC.PixelIdxList{jj},1) > 25
-                idxToKeep = CC.PixelIdxList(jj);
-                idxToKeep = vertcat(idxToKeep{:});
-                mask = false(size(miniim));
-                mask(idxToKeep) = true;
-                [r,c] = find(mask);
-                cloud = [c,r];
-                temp = [mean(cloud(:,1)),mean(cloud(:,2))];
-                
-                distance(jj) = norm(temp-ledPos); 
-            else
-                distance(jj) = Inf;
+        if count==1
+            if norm([pupil_ellipse(1),pupil_ellipse(2)]-pupilCenterEst)>5
+                imshow(miniim);caxis([20 50]);
+                title('Click on a bunch of points around pupil edge');
+                [X,Y] = getpts;
+                if isempty(X)
+                    pupil_ellipse = [0 0 0 0 0]';
+                else
+                    [z,a,b,alpha] = fitellipse([X,Y]');
+                    pupil_ellipse = [z;a;b;alpha];
+                end
+            end
+        else
+            if norm([pupil_ellipse(1),pupil_ellipse(2)]-pupilCenterEst)>10 || ...
+                    abs((pupil_ellipse(3)+pupil_ellipse(4))-pupilDiameter(count-1))>10
+                imshow(miniim);caxis([20 50]);
+                title('Click on a bunch of points around pupil edge');
+                [X,Y] = getpts;
+                if isempty(X)
+                    pupil_ellipse = [0 0 0 0 0]';
+                else
+                    try
+                        [z,a,b,alpha] = fitellipse([X,Y]');
+                        pupil_ellipse = [z;a;b;alpha];
+                    catch
+                        imshow(miniim);caxis([20 50]);
+                        title('Click on a bunch of points around pupil edge');
+                        [X,Y] = getpts;
+                        [z,a,b,alpha] = fitellipse([X,Y]');
+                        pupil_ellipse = [z;a;b;alpha];
+                    end
+                end
             end
         end
         
-        [~,ind] = min(distance);
+        pupilCenterEst = [pupil_ellipse(1),pupil_ellipse(2)];
         
-        idxToKeep = CC.PixelIdxList(ind);
-        idxToKeep = vertcat(idxToKeep{:});
-        pupilmask = false(size(miniim));
-        pupilmask(idxToKeep) = true;
-        
-        pupilmask = edge(pupilmask,'Canny');
-        
-        [r,c] = find(pupilmask);
-        cloud = [c,r];
-        
-%         imagesc(miniim);colormap('bone');caxis([20 50]);
-%         hold on;plot(c,r,'.');pause(1/100);
-%         pupilRotation(count,:) = [mean(cloud(:,1)),mean(cloud(:,2))]-ledPos;
-%         
-%         find pupil, best-fitting ellipse
-        try
-            [z,a,b,alpha] = fitellipse(cloud');
-            pupilTranslation(count,:) = ledPos;
-            pupilArea(count) = a*b*pi;
-            pupilRotation(count,:) = z'-ledPos;
-            imagesc(miniim);colormap('bone');caxis([20 60]);
-            hold on;plotellipse(z,a,b,alpha);
-            pause(1/100);
-        catch
-           blink(count) = 1; 
+        if sum(pupil_ellipse)==0
+            blink(count) = 1;
+            pupilCenterEst = pupilRotation(count-1,:)+pupilTranslation(count-1,:);
+        else
+%             imagesc(miniim);colormap('bone');caxis([20 60]);
+%             hold on;plotellipse(pupil_ellipse(1:2)',pupil_ellipse(3),pupil_ellipse(4),pupil_ellipse(5),'b--');
+%             pause(1/100);
         end
+
+        pupilTranslation(count,:) = ledPos;
+        pupilArea(count) = pupil_ellipse(3)*pupil_ellipse(4)*pi;
+        pupilRotation(count,:) = [pupil_ellipse(1),pupil_ellipse(2)]-ledPos;
+        pupilDiameter(count) = pupil_ellipse(3)+pupil_ellipse(4);
     end
 end
+N = count;
+pupilArea = pupilArea(1:N);
+pupilDiameter = pupilDiameter(1:N);
+pupilRotation = pupilRotation(1:N,:);
+pupilTranslation = pupilTranslation(1:N,:);
+time = linspace(0,N/v.FrameRate,N);
 
-
-
-
+filename = filename(1:end-4);
+filename = strcat(filename,'.mat');
+save(filename,'pupilArea','pupilRotation','pupilTranslation',...
+    'pupilDiameter','N','time','blink');
 end
