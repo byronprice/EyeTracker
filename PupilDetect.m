@@ -96,13 +96,14 @@ for ii=1:N
                 [pupil_ellipse,~] = ...
                     detect_pupil_and_corneal_reflection(miniim,meanPupilPos(1),meanPupilPos(2),edgeThreshold,luminanceThreshold);
             end
-        end
+       
         
-        if sum(pupil_ellipse)==0
-            blink(count) = 1;flagged(count) = 1;
-            pupilCenterEst = pupilRotation(count-1,:)+pupilTranslation(count-1,:);
-        else
-            pupilCenterEst = [pupil_ellipse(1),pupil_ellipse(2)];
+            if sum(pupil_ellipse)==0
+                blink(count) = 1;flagged(count) = 1;
+                pupilCenterEst = pupilRotation(count-1,:)+pupilTranslation(count-1,:);
+            else
+                pupilCenterEst = [pupil_ellipse(1),pupil_ellipse(2)];
+            end
         end
 
         pupilTranslation(count,:) = ledPos;
@@ -119,10 +120,11 @@ pupilRotation = pupilRotation(1:N,:);
 pupilTranslation = pupilTranslation(1:N,:);
 time = linspace(0,N/v.FrameRate,N);
 pupilEllipseInfo = pupilEllipseInfo(1:N,:);
+Fs = v.FrameRate;
 
 filename = filename(1:end-4);
 filename = strcat(filename,'.mat');
 save(filename,'pupilArea','pupilRotation','pupilTranslation',...
     'pupilDiameter','N','time','blink','meanLuminance','pupilEllipseInfo',...
-    'flagged','minX','maxX','minY','maxY','luminanceThreshold','edgeThreshold');
+    'flagged','minX','maxX','minY','maxY','luminanceThreshold','edgeThreshold','Fs');
 end
