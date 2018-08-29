@@ -85,7 +85,7 @@ if hasFrame(v)
     greyLuminance = double(greyLuminance);
     
     luminanceThreshold = mean(pupilLuminance)+2*std(pupilLuminance);
-    edgeThreshold = max(round(mean(greyLuminance)-mean(pupilLuminance)),4);
+    edgeThreshold = max(3*std(pupilLuminance),4);
     
 
     filename = filename(1:end-4);
