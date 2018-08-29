@@ -32,6 +32,8 @@ catch
     return;
 end
 
+originalCenterEst = pupilCenterEst;
+
 v = VideoReader(filename);
 N = ceil(v.Duration*v.FrameRate);
 
@@ -90,11 +92,12 @@ for ii=1:N
                     abs((pupil_ellipse(3)+pupil_ellipse(4))-pupilDiameter(count-1))>5
                 flagged(count) = 1;
             end
-            meanPupilPos = mean(pupilEllipseInfo(1:count-1,1:2),1);
-            if norm([pupil_ellipse(1),pupil_ellipse(2)]-meanPupilPos)>30
+
+            if norm([pupil_ellipse(1),pupil_ellipse(2)]-originalCenterEst)>25
                 flagged(count) = 1;
                 [pupil_ellipse,~] = ...
-                    detect_pupil_and_corneal_reflection(miniim,meanPupilPos(1),meanPupilPos(2),edgeThreshold,luminanceThreshold);
+                    detect_pupil_and_corneal_reflection(miniim,...
+                    originalCenterEst(1),originalCenterEst(2),edgeThreshold,luminanceThreshold);
             end
        
         
@@ -103,6 +106,12 @@ for ii=1:N
                 pupilCenterEst = pupilRotation(count-1,:)+pupilTranslation(count-1,:);
             else
                 pupilCenterEst = [pupil_ellipse(1),pupil_ellipse(2)];
+            end
+        else
+            if sum(pupil_ellipse)==0
+                blink(count) = 1;flagged(count) = 1;
+                pupil_ellipse(1) = pupilCenterEst(1);
+                pupil_ellipse(2) = pupilCenterEst(2);
             end
         end
 
