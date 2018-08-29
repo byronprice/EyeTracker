@@ -84,28 +84,12 @@ for ii=1:N
 %         newv = [pupil_ellipse(3),pupil_ellipse(4),pupil_ellipse(1),pupil_ellipse(2),pupil_ellipse(5)];
 %         I = plot_ellipse_in_image(miniim,newv);
 %         imagesc(I);pause(1/80);
-        if count==1
-            if norm([pupil_ellipse(1),pupil_ellipse(2)]-pupilCenterEst)>5
-                pupil_ellipse = pupil_ellipse(:);
-                imshow(miniim);caxis([20 50]);
-%                 hold on;plotellipse(pupil_ellipse(1:2),pupil_ellipse(3),pupil_ellipse(4),pupil_ellipse(5),'r--');
-                title('Click on a bunch of points around pupil edge');
-                [X,Y] = getpts;
-                if isempty(X)
-                    pupil_ellipse = [0 0 0 0 0]';
-                else
-                    [z,a,b,alpha] = fitellipse([X,Y]');
-                    pupil_ellipse = [z;a;b;alpha];
-                end
-            end
-        else
+        
+        if count>1
             if norm([pupil_ellipse(1),pupil_ellipse(2)]-pupilCenterEst)>5 || ...
                     abs((pupil_ellipse(3)+pupil_ellipse(4))-pupilDiameter(count-1))>5
                 flagged(count) = 1;
-            end  
-        end
-        
-        if count>1
+            end
             meanPupilPos = mean(pupilEllipseInfo(1:count-1,1:2),1);
             if norm([pupil_ellipse(1),pupil_ellipse(2)]-meanPupilPos)>30
                 flagged(count) = 1;
