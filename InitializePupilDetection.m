@@ -19,7 +19,7 @@ function [] = InitializePupilDetection(filename)
 
 %CREATED: 2018/08/28
 %  Byron Price
-%UPDATED: 2018/08/28
+%UPDATED: 2018/09/04
 % By: Byron Price
 
 v = VideoReader(filename);
@@ -28,15 +28,15 @@ if hasFrame(v)
     im = readFrame(v);
     im = mean(im,3);
     imshow(uint8(im));
-    title('Click on 4 corners around mouse''s eye');
+    title('Click the center of the eye');
     [X,Y] = getpts;
-    minX = round(min(X));maxX = round(max(X));
-    minY = round(min(Y));maxY = round(max(Y));
+    minX = round(X-40);maxX = round(X+40);
+    minY = round(Y-30);maxY = round(Y+30);
     
     tmp = im(minY:maxY,minX:maxX);
     
     imshow(uint8(tmp));caxis([30 150]);
-    title('Click on center of pupil');
+    title('Click the center of the pupil');
     [X,Y] = getpts;
     pupilCenterEst = [X,Y];
     
@@ -51,7 +51,9 @@ if hasFrame(v)
         title('Click a bunch of points in pupil');
         [X,Y] = getpts;
         for ii=1:length(X)
-            pupilLuminance = [pupilLuminance;tmp(round(Y(ii)),round(X(ii)))];
+            if tmp(round(Y(ii)),round(X(ii)))<100
+                pupilLuminance = [pupilLuminance;tmp(round(Y(ii)),round(X(ii)))];
+            end
         end
     end
     pupilLuminance = double(pupilLuminance);
