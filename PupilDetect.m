@@ -19,7 +19,7 @@ function [] = PupilDetect(filename)
 
 %CREATED: 2018/07/10
 %  Byron Price
-%UPDATED: 2018/08/28
+%UPDATED: 2018/09/05
 % By: Byron Price
 
 % filename = 'EyeTracker_20180709-6028141.avi';
