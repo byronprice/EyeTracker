@@ -105,13 +105,13 @@ pupilmask(idxToKeep) = true;
 
 
 [r,c] = find(pupilmask);
-cloud = [c,r];
+cloud = [r,c];
 
 tempepx = [];
 tempepy = [];
 
 for ii=1:length(epx)
-    dist = min(sqrt((cloud(:,1)-epx(ii)).^2+(cloud(:,2)-epy(ii)).^2));
+    dist = min(sqrt((cloud(:,1)-epy(ii)).^2+(cloud(:,2)-epx(ii)).^2));
     if dist<10
         tempepx = [tempepx,epx(ii)];
         tempepy = [tempepy,epy(ii)];
@@ -121,11 +121,11 @@ epx = tempepx;
 epy = tempepy;
 % [pupil_ellipse, inliers] = fit_ellipse_ransac(epx, epy, max_ransac_iterations);
 % imagesc(I);
-% hold on;plot(epx,epy,'.r');pause(1/100);
+% hold on;plot(epx(:),epy(:),'.r');pause(1/100);
 pupilmask = zeros(size(I));
 
 for ii=1:length(epx)
-   pupilmask(epx(ii),epy(ii)) = 1;
+   pupilmask(epy(ii),epx(ii)) = 1;
 end
 
 for ii=1:length(cloud)
@@ -142,10 +142,11 @@ idxToKeep = CC.PixelIdxList(ind);
 idxToKeep = vertcat(idxToKeep{:});
 
 pupilmask = false(size(I));
-pupilmask(idxToKeep) = true;
+
+pupilmask(idxToKeep(:)) = true;
 
 [r,c] = find(pupilmask);
-cloud = [r,c];
+cloud = [c,r];
 
 % imagesc(I);hold on;
 % plot(cloud(:,1),cloud(:,2),'.r');pause(1/100);
