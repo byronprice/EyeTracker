@@ -59,7 +59,7 @@ if hasFrame(v)
     pupilLuminance = double(pupilLuminance);
     
     luminanceThreshold = mean(pupilLuminance)+2*std(pupilLuminance);
-    edgeThreshold = round(min(max(3*std(pupilLuminance),4),10));
+    edgeThreshold = round(min(max(2*std(pupilLuminance),2),10));
     
 
     filename = filename(1:end-4);
