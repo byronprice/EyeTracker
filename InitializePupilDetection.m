@@ -19,7 +19,7 @@ function [] = InitializePupilDetection(filename)
 
 %CREATED: 2018/08/28
 %  Byron Price
-%UPDATED: 2018/09/04
+%UPDATED: 2018/09/22
 % By: Byron Price
 
 v = VideoReader(filename);
@@ -41,14 +41,14 @@ if hasFrame(v)
     pupilCenterEst = [X,Y];
     
     pupilLuminance = [];
-    for jj=1:5
+    for jj=1:50
         v.CurrentTime = (v.Duration-1).*rand;
         im = readFrame(v);
         
         tmp = im(minY:maxY,minX:maxX);
         
-        imshow(uint8(tmp));caxis([30 150]);
-        title('Click a bunch of points in pupil');
+        imshow(uint8(tmp));caxis([30 100]);
+        title('Click a point in pupil');
         [X,Y] = getpts;
         for ii=1:length(X)
             if tmp(round(Y(ii)),round(X(ii)))<100
@@ -61,7 +61,8 @@ if hasFrame(v)
     luminanceThreshold = mean(pupilLuminance)+2*std(pupilLuminance);
     edgeThreshold = round(min(max(2*std(pupilLuminance),2),10));
     
-
+    fprintf('Luminance Threshold: %3.2f\n',luminanceThreshold);
+    
     filename = filename(1:end-4);
     filename = strcat(filename,'-Init.mat');
     save(filename,'minX','minY','maxX','maxY','pupilCenterEst','luminanceThreshold',...
