@@ -1,10 +1,10 @@
 % code to train MLP to detect pupil position and diameter
-files = dir('EyePos_2018*.avi');
+files = dir('RetinoCall_2018*.avi');
 
 load('EyeTrackingMLP.mat');
 iterCount = 0;
 iters = 1:length(files);
-iters = iters(random('Discrete Uniform',length(files),[5000,1]));
+iters = iters(random('Discrete Uniform',length(files),[501,1]));
 for zz=iters
     filename = files(zz).name;
     tmpFilename = filename(1:end-4);
@@ -12,7 +12,7 @@ for zz=iters
     try
         load(tmpFilename,'minX','minY','maxX','maxY','luminanceThreshold');
     catch
-        return;
+        break;
     end
     
     tmpFilename = filename(1:end-4);
@@ -48,7 +48,7 @@ for zz=iters
     lambda = 100;
     
     for ii=1:10
-        indeces = ceil(rand([batchSize,1]).*(N-1));
+        indeces = ceil(rand([batchSize,1]).*(N-10));
         [dropOutNet,dropOutInds] = MakeDropOutNet(Network,alpha);
         
         for jj=1:numCalcs
@@ -80,8 +80,9 @@ for zz=iters
     
     [Network] = AdjustDropOutNet(Network,alpha);
 
-    iterCount = iterCount+1
+    iterCount = iterCount+1;
     if mod(iterCount,500) == 0
         save('EyeTrackingMLP.mat','Network','alpha','batchSize','eta','lambda');
     end
+    clear v;
 end
