@@ -1,5 +1,5 @@
 % code to train MLP to detect pupil position and diameter
-files = dir('RetinoCall_2018*.avi');
+files = dir('*.avi');
 
 load('EyeTrackingMLP.mat');
 iterCount = 0;
