@@ -67,7 +67,7 @@ Winv = pinv(W);
 % TRANSFORM ALL OF THE DATA INTO PC SPACE
 clear v;
 v = VideoReader(filename);
-totalFrames = ceil(v.Duration*v.FrameRate);
+totalFrames = round(v.Duration*v.FrameRate);
 
 pcaRep = zeros(totalFrames,q);
 for ii=1:totalFrames
