@@ -3,7 +3,7 @@ function [] = WaveletPCA(filename)
 %   Detailed explanation goes here
 
 v = VideoReader(filename);
-totalFrames = ceil(v.Duration*v.FrameRate);
+totalFrames = round(v.Duration*v.FrameRate);
 im = readFrame(v);
 im = mean(im,3);
 DIM = size(im);
