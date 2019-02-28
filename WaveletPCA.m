@@ -67,14 +67,20 @@ Winv = pinv(W);
 % TRANSFORM ALL OF THE DATA INTO PC SPACE
 clear v;
 v = VideoReader(filename);
-totalFrames = round(v.Duration*v.FrameRate);
+totalFrames = ceil(v.Duration*v.FrameRate);
 
 pcaRep = zeros(totalFrames,q);
 for ii=1:totalFrames
-    im = readFrame(v);
-    im = mean(im,3);
-    [C,~] = wavedec2(im,wvltLevel,wvltType);
-    pcaRep(ii,:) = (Winv*(C(:)-mu))';
+    if hasFrame(v)
+        im = readFrame(v);
+        im = mean(im,3);
+        [C,~] = wavedec2(im,wvltLevel,wvltType);
+        pcaRep(ii,:) = (Winv*(C(:)-mu))';
+    end
+end
+
+if sum(pcaRep(end,:))==0
+    pcaRep = pcaRep(1:end-1,:);
 end
 
 clear v;
