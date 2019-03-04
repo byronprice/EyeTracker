@@ -25,7 +25,9 @@ function [] = InitializePupilDetection(filename)
 v = VideoReader(filename);
 
 if hasFrame(v)
+    v.CurrentTime = (v.Duration-1).*rand;
     im = readFrame(v);
+
     im = mean(im,3);
     imshow(uint8(im));
     title('Click the center of the eye');
@@ -40,33 +42,10 @@ if hasFrame(v)
     [X,Y] = getpts;
     pupilCenterEst = [X,Y];
     
-    pupilLuminance = [];
-    for jj=1:50
-        v.CurrentTime = (v.Duration-1).*rand;
-        im = readFrame(v);
-        
-        tmp = im(minY:maxY,minX:maxX);
-        
-        imshow(uint8(tmp));caxis([30 100]);
-        title('Click a point in pupil');
-        [X,Y] = getpts;
-        for ii=1:length(X)
-            if tmp(round(Y(ii)),round(X(ii)))<100
-                pupilLuminance = [pupilLuminance;tmp(round(Y(ii)),round(X(ii)))];
-            end
-        end
-    end
-    pupilLuminance = double(pupilLuminance);
-    
-    luminanceThreshold = mean(pupilLuminance)+2*std(pupilLuminance);
-    edgeThreshold = round(min(max(2*std(pupilLuminance),2),10));
-    
-    fprintf('Luminance Threshold: %3.2f\n',luminanceThreshold);
-    
     filename = filename(1:end-4);
     filename = strcat(filename,'-Init.mat');
-    save(filename,'minX','minY','maxX','maxY','pupilCenterEst','luminanceThreshold',...
-        'edgeThreshold');
+    save(filename,'minX','minY','maxX','maxY','pupilCenterEst');
 
 end
+
 end
