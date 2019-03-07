@@ -26,7 +26,7 @@ wvltType = 'db6';
 fullSize = length(C(:));
 
 % online pca
-numPCA = min(1e4,ceil(totalFrames/2));
+numPCA = min(5e3,ceil(totalFrames/2));
 times = randperm(totalFrames,numPCA);
 
 q = 30;
@@ -48,6 +48,7 @@ for tt=1:numPCA
         W = W+step(tt)*meanSubtract*phi;
         W = GramSchmidt(W);
         eigenvalues = eigenvalues+step(tt)*((phi').^2-eigenvalues);
+        disp(tt/numPCA);
     end
 end
 
@@ -77,6 +78,7 @@ for ii=1:totalFrames
         [C,~] = wavedec2(im,wvltLevel,wvltType);
         pcaRep(ii,:) = (Winv*(C(:)-mu))';
     end
+    disp(ii/totalFrames);
 end
 
 if sum(pcaRep(end,:))==0

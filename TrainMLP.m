@@ -1,12 +1,10 @@
 % code to train MLP to detect pupil position and diameter
 files = dir('*.avi');
 
-load('EyeTrackingConvNet.mat');
+load('EyeTrackingGroundTruth.mat');
 
-iterCount = 0;
 iters = 1:length(files);
-iters = iters(random('Discrete Uniform',length(files),[length(files),1]));
-data = cell(1,5);
+iters = iters(random('Discrete Uniform',length(files),[5*length(files),1]));
 for zz=iters
     filename = files(zz).name;
     tmpFilename = filename(1:end-4);
@@ -14,11 +12,12 @@ for zz=iters
     try
         load(tmpFilename,'minX','minY','maxX','maxY');
     catch
-        break;
+        fprintf('No -Init.mat file for file: %s\n',filename);
+        continue;
     end
     
     v = VideoReader(filename);
-    N = 500;
+    N = 100;
     
     for ii=1:N
        
@@ -45,6 +44,15 @@ for zz=iters
     end
     
     clear v;
+    
+    response = input('Proceed to next mouse? (y/n): ','s');
+    
+    if response == 'y'
+        save('EyeTrackingGroundTruth.mat','data','iterCount');
+    else
+        save('EyeTrackingGroundTruth.mat','data','iterCount');
+        break;
+    end
     
 %     for ii=1:2
 %         meanVal = mean(DesireOutput(ii,:));stdVal = std(DesireOutput(ii,:));
