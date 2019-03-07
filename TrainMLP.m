@@ -6,7 +6,7 @@ load('EyeTrackingGroundTruth.mat');
 iters = 1:length(files);
 iters = iters(random('Discrete Uniform',length(files),[5*length(files),1]));
 for zz=iters
-    filename = files(zz).name;
+    filename = files(zz).name;data = cell(1,5);
     tmpFilename = filename(1:end-4);
     tmpFilename = strcat(tmpFilename,'-Init.mat');
     try
@@ -39,7 +39,7 @@ for zz=iters
           data{iterCount,2} = box;
           data{iterCount,3} = [X,Y];
           data{iterCount,4} = time;
-          data{itercount,5} = filename;
+          data{iterCount,5} = filename;
        end
     end
     
