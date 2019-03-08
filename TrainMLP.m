@@ -2,7 +2,7 @@
 files = dir('*.avi');
 
 load('EyeTrackingGroundTruth.mat');
-
+figure(1);
 iters = 1:length(files);
 iters = iters(random('Discrete Uniform',length(files),[5*length(files),1]));
 for zz=iters
@@ -27,8 +27,10 @@ for zz=iters
 
        im = mean(im,3);
        tmp = im(minY:maxY,minX:maxX);
+       figure(1);
        imshow(uint8(tmp));caxis([30 100]);
        title('Click 4 points on edges of pupil');
+       set(gcf,'Position',[500,500,800,800]);
        [X,Y] = getpts;
        
        

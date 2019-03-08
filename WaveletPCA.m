@@ -26,7 +26,7 @@ wvltType = 'db6';
 fullSize = length(C(:));
 
 % online pca
-numPCA = min(5e3,ceil(totalFrames/2));
+numPCA = min(1e4,ceil(totalFrames/2));
 times = randperm(totalFrames,numPCA);
 
 q = 30;
