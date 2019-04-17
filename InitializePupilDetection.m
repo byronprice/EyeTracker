@@ -19,33 +19,38 @@ function [] = InitializePupilDetection(filename)
 
 %CREATED: 2018/08/28
 %  Byron Price
-%UPDATED: 2018/09/22
+%UPDATED: 2019/04/17
 % By: Byron Price
 
-v = VideoReader(filename);
+savefilename = filename(1:end-4);
+savefilename = strcat(savefilename,'-Init.mat');
 
-if hasFrame(v)
-    v.CurrentTime = (v.Duration-1).*rand;
-    im = readFrame(v);
-
-    im = mean(im,3);
-    imshow(uint8(im));
-    title('Click the center of the eye');
-    [X,Y] = getpts;
-    minX = round(X-40);maxX = round(X+40);
-    minY = round(Y-30);maxY = round(Y+30);
+if exist(savefilename,'file')==2
+    return;
+else
+    v = VideoReader(filename);
     
-    tmp = im(minY:maxY,minX:maxX);
-    
-    imshow(uint8(tmp));caxis([30 150]);
-    title('Click the center of the pupil');
-    [X,Y] = getpts;
-    pupilCenterEst = [X,Y];
-    
-    filename = filename(1:end-4);
-    filename = strcat(filename,'-Init.mat');
-    save(filename,'minX','minY','maxX','maxY','pupilCenterEst');
-
+    if hasFrame(v)
+        v.CurrentTime = (v.Duration-1).*rand;
+        im = readFrame(v);
+        
+        im = mean(im,3);
+        imshow(uint8(im));
+        title('Click the center of the eye');
+        [X,Y] = getpts;
+        minX = round(X-40);maxX = round(X+40);
+        minY = round(Y-30);maxY = round(Y+30);
+        
+        tmp = im(minY:maxY,minX:maxX);
+        
+        imshow(uint8(tmp));caxis([30 150]);
+        title('Click the center of the pupil');
+        [X,Y] = getpts;
+        pupilCenterEst = [X,Y];
+        
+        save(savefilename,'minX','minY','maxX','maxY','pupilCenterEst');
+        
+    end
 end
 
 end
