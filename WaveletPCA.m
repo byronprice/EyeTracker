@@ -1,4 +1,4 @@
-function [] = WaveletPCA(filename)
+function [] = WaveletPCA(filename,imInds)
 %WaveletPCA.m
 %   Detailed explanation goes here
 savefilename = filename(1:end-4);
@@ -10,8 +10,15 @@ else
     v = VideoReader(filename);
     totalFrames = round(v.Duration*v.FrameRate);
     im = readFrame(v);
-    im = mean(im,3);
-    DIM = size(im);
+    
+    if nargin<2
+        DIM = size(im);
+        imInds = [1,DIM(1),1,DIM(2)];
+        im = mean(im(imInds(1):imInds(2),imInds(3):imInds(4)),3);
+    else
+        im = mean(im(imInds(1):imInds(2),imInds(3):imInds(4)),3);
+        DIM = size(im);
+    end
     
     % vidTime = 250/1000;
     % numFrames = ceil(vidTime/(1/v.FrameRate));
@@ -25,25 +32,25 @@ else
     %
     % fullSize = length(all);
     
-    wvltLevel = 5;
+    wvltLevel = 3;
     wvltType = 'db6';
-    [C,~] = wavedec2(im,wvltLevel,wvltType);
+    [C,S] = wavedec2(im,wvltLevel,wvltType);
     fullSize = length(C(:));
     
     % online pca
-    numPCA = min(1e4,ceil(totalFrames/2));
+    numPCA = min(1e5,ceil(totalFrames/2));
     times = randperm(totalFrames,numPCA);
     
-    q = 30;
+    q = 500;
     W = normrnd(0,1,[fullSize,q]);
     eigenvalues = zeros(q,1);
     mu = zeros(fullSize,1);
     
-    step = min(0.1,1./(1:numPCA));
+    step = max(min(0.1,1./(1:numPCA)),1e-4);
     for tt=1:numPCA
         v.CurrentTime = (times(tt)-1)./v.FrameRate;
         im = readFrame(v);
-        im = mean(im,3);
+        im = mean(im(imInds(1):imInds(2),imInds(3):imInds(4)),3);
         [C,~] = wavedec2(im,wvltLevel,wvltType);
         meanSubtract = C(:)-mu;
         mu = mu+(1/(tt+1))*meanSubtract;
@@ -53,7 +60,6 @@ else
             W = W+step(tt)*meanSubtract*phi;
             W = GramSchmidt(W);
             eigenvalues = eigenvalues+step(tt)*((phi').^2-eigenvalues);
-            disp(tt/numPCA);
         end
     end
     
@@ -79,7 +85,7 @@ else
     for ii=1:totalFrames
         if hasFrame(v)
             im = readFrame(v);
-            im = mean(im,3);
+            im = mean(im(imInds(1):imInds(2),imInds(3):imInds(4)),3);
             [C,~] = wavedec2(im,wvltLevel,wvltType);
             pcaRep(ii,:) = (Winv*(C(:)-mu))';
         end
@@ -94,7 +100,7 @@ else
     newName = filename(1:end-4);
     newName = strcat(newName,'-wvltpca.mat');
     save(newName,'pcaRep','W','Winv','mu','q','wvltLevel','wvltType',...
-        'DIM','filename','eigenvalues');
+        'DIM','filename','eigenvalues','S');
     
     disp(['File Completed: ',filename]);
     
