@@ -63,12 +63,12 @@ else
         end
     end
     fprintf('Computing ICA ...\n');
-    [W, Tinv,T, mu] = kICA(data,q);
+    [W, Tinv, mu] = fastICA(data,q,'negentropy');
     
     fprintf('ICA Complete ...\n');
 
     WTinv = W*Tinv;
-    TWt = T*W';
+    TWt = Tinv\W';
 
     clear W Tinv T;
     % TRANSFORM ALL OF THE DATA INTO IC SPACE
