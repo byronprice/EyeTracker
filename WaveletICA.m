@@ -61,12 +61,12 @@ else
         end
     end
     fprintf('Computing ICA ... \n');
-    [ W, Tinv, mu] = kICA(data,q);
+    [ W, Tinv,T, mu] = kICA(data,q);
     fprintf('ICA Complete ... \n');
     WTinv = W*Tinv;
-    TWt = Tinv\W';
+    TWt = T*W';
 
-    clear Tinv W;    
+    clear Tinv W T;
     % TRANSFORM ALL OF THE DATA INTO IC SPACE
     clear v data;
     v = VideoReader(filename);

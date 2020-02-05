@@ -1,4 +1,4 @@
-function [ W, Tinv, mu] = kICA(Z,r)
+function [ W, Tinv, T,mu] = kICA(Z,r)
 %
 % Syntax:       Zica = kICA(Z,r);
 %               [Zica, W, T, mu] = kICA(Z,r);
@@ -38,6 +38,7 @@ R = sum(S>tolerance);
 U = U(:,1:R);
 S = S(1:R);
 Tinv = U*diag(1./sqrt(S))*U';
+T = U*diag(sqrt(S))*U';
 Zcw = Tinv*Z;
 
 % Max-kurtosis ICA
