@@ -31,9 +31,13 @@ function [ W, Tinv, mu] = kICA(Z,r)
 % Center and whiten data
 mu = mean(Z,2);
 Z = bsxfun(@minus,Z,mu);ZtZ = Z*Z'./(size(Z,2)-1);
-R = rank(ZtZ);
-[U,S,~] = svds(ZtZ,R);
-Tinv = U*diag(1./sqrt(diag(S)))*U';
+[U,S,~] = svd(ZtZ);
+S = diag(S);
+tolerance = max(size(ZtZ))*eps(max(S));
+R = sum(S>tolerance);
+U = U(:,1:R);
+S = S(1:R);
+Tinv = U*diag(1./sqrt(S))*U';
 Zcw = Tinv*Z;
 
 % Max-kurtosis ICA
