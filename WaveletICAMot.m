@@ -63,14 +63,14 @@ else
         end
     end
     fprintf('Computing ICA ...\n');
-    [W, Tinv, mu] = fastICA(data,q,'negentropy');
+    [W, Tinv, mu] = kICA(data,q);
     
     fprintf('ICA Complete ...\n');
 
     WTinv = W*Tinv;
     TWt = Tinv\W';
 
-    clear W Tinv T;
+    clear W Tinv;
     % TRANSFORM ALL OF THE DATA INTO IC SPACE
     clear v data;
     v = VideoReader(filename);

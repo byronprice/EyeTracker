@@ -1,4 +1,4 @@
-function [ W, Tinv,T, mu] = kICA(Z,r)
+function [ W, Tinv, mu] = kICA(Z,r)
 %
 % Syntax:       Zica = kICA(Z,r);
 %               [Zica, W, T, mu] = kICA(Z,r);
@@ -31,14 +31,10 @@ function [ W, Tinv,T, mu] = kICA(Z,r)
 % Center and whiten data
 mu = mean(Z,2);
 Z = bsxfun(@minus,Z,mu);ZtZ = Z*Z'./(size(Z,2)-1);
-try
-   T = chol(ZtZ);T = T';
-   Tinv = inv(T);
-catch
-    T = sqrtm(ZtZ);
-    Tinv = inv(T);
-end
-Zcw = T\Z;
+R = rank(ZtZ);
+[U,S,~] = svds(ZtZ,R);
+Tinv = U*diag(1./sqrt(diag(S)))*U';
+Zcw = Tinv*Z;
 
 % Max-kurtosis ICA
 [W, ~, ~] = svd(bsxfun(@times,sum(Zcw.^2,1),Zcw) * Zcw');
