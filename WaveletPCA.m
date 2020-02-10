@@ -91,7 +91,7 @@ else
         end
     end
     
-    if sum(pcaRep(end,:))==0
+    if sum(abs(pcaRep(end,:)))<=1e-6
         pcaRep = pcaRep(1:end-1,:);
     end
     

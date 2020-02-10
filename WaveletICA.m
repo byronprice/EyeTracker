@@ -83,7 +83,7 @@ else
         end
     end
     
-    if sum(icaRep(end,:))<=1e-6
+    if sum(abs(icaRep(end,:)))<=1e-6
         icaRep = icaRep(1:end-1,:);
     end
     
