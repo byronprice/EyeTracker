@@ -31,7 +31,7 @@ else
     % end
     %
     % fullSize = length(all);
-    
+    DIM = DIM(1:2);
     fullSize = prod(DIM);
     
     % online pca
@@ -40,7 +40,7 @@ else
     
     q = 500;
     fprintf('Data Size: [%d , %d]\n',fullSize,numPCA);
-    data = zeros(fullSize,numPCA);
+    data = zeros(fullSize,numPCA,'single');
     
     count = 0;
     while count<numPCA
@@ -62,6 +62,8 @@ else
     fprintf('Computing PCA ... \n');
     [W,mu] = PCA(data,q);
     fprintf('PCA Complete ... \n');
+    W = double(W);
+    mu = double(mu);
     Winv = pinv(W);
     % TRANSFORM ALL OF THE DATA INTO IC SPACE
     clear v data;
