@@ -1,4 +1,4 @@
-function [ U, mu, eigVecs] = PCA(Z,r)
+function [ W, mu, eigVecs] = PCA(Z,r)
 %
 % Syntax:       Zpca = PCA(Z,r);
 %               [Zpca, U, mu] = PCA(Z,r);
@@ -36,10 +36,18 @@ function [ U, mu, eigVecs] = PCA(Z,r)
 
 % Compute truncated SVD
 %[U, S, V] = svds(Zc,r); % Equivalent, but usually slower than svd()
-[U, S, V] = svd(Zc,'econ');
-U = U(:,1:r);
-S = S(1:r,1:r);
-V = V(:,1:r);
+%[U, S, V] = svd(Zc,'econ');
+%U = U(:,1:r);
+%S = S(1:r,1:r);
+%V = V(:,1:r);
+
+[d,N] = size(Zc);
+[V,D] = eig(Zc*Zc'./(N-1));
+start = d-r+1;
+eigenvals = diag(D);
+meanEig = mean(eigenvals(1:start-1));
+W = V(:,start:end)*sqrtm(D(start:end,start:end)-meanEig.*eye(r));
+W = fliplr(W);
 
 % Compute principal components
 %Zpca = S * V';
