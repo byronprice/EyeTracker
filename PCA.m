@@ -36,24 +36,29 @@ function [ W, mu, eigVecs] = PCA(Z,r)
 
 % Compute truncated SVD
 %[U, S, V] = svds(Zc,r); % Equivalent, but usually slower than svd()
-%[U, S, V] = svd(Zc,'econ');
-%U = U(:,1:r);
-%S = S(1:r,1:r);
-%V = V(:,1:r);
-
+[U, S, V] = svd(Zc','econ');
 [d,N] = size(Zc);
-[V,D] = eig(Zc*Zc'./(N-1));
-start = d-r+1;
-eigenvals = diag(D);
-meanEig = mean(eigenvals(1:start-1));
-W = V(:,start:end)*sqrtm(D(start:end,start:end)-meanEig.*eye(r));
-W = fliplr(W);
+eigenvals = diag(S.^2/(N-1));
+
+if r<d
+    meanEig = mean(eigenvals(r+1:end));
+    W = V(:,1:r)*diag(sqrt(eigenvals(1:r)-meanEig));
+else
+    W = V*diag(sqrt(eigenvals));
+end
+
+% [V,D] = eig(Zc*Zc'./(N-1));
+% start = d-r+1;
+% eigenvals = diag(D);
+% meanEig = mean(eigenvals(1:start-1));
+% W = V(:,start:end)*sqrtm(D(start:end,start:end)-meanEig.*eye(r));
+% W = fliplr(W);
 
 % Compute principal components
 %Zpca = S * V';
 %Zpca = U' * Zc; % Equivalent but slower
 
-if nargout >= 4
+if nargout >= 3
     % Scaled eigenvectors
     eigVecs = bsxfun(@times,U,diag(S)' / sqrt(size(Z,2)));
 end
