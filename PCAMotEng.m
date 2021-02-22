@@ -79,7 +79,7 @@ else
     pcaRep(1,:) = (Winv*(C(:)-mu))'; % to go the other way W*pcaRep'+mu
     prevIm = im;
     
-    checks = round(linspace(2,totalFrames,20));checkcount=1;    
+    checks = round(linspace(2,totalFrames,20));checkcount=1;
     for ii=2:totalFrames
         if hasFrame(v)
             im = readFrame(v);
@@ -88,10 +88,10 @@ else
             pcaRep(ii,:) = (Winv*(C(:)-mu))';
             prevIm = im;
         end
-	if checks(checkcount)==ii
-	    fprintf('%3.2f Percent Complete\n',100*ii/totalFrames);
+        if checks(checkcount)==ii
+            fprintf('%3.2f Percent Complete\n',100*ii/totalFrames);
             checkcount = checkcount+1;
-	end
+        end
     end
     
     if sum(abs(pcaRep(end,:)))<=1e-6
